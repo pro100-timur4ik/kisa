@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0B0F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Моя волна — Для Олеси от Тимура 💛</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0B0F;--y:#FED42B;--yh:#FFCC00;--p:#FF4B72;--a:#FF8C42;--mut:#9898A6;
+  --c1:#FED42B;--c2:#FF8C42;--c3:#FF4B72;
+  --cs:300px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);overflow:hidden;overscroll-behavior:none}
+body{position:fixed;inset:0;color:#fff;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;
+  touch-action:manipulation;-webkit-text-size-adjust:100%;
+  display:flex;align-items:center;justify-content:center}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-appearance:none;appearance:none}
+
+/* ===== Свечение «Моей волны» ===== */
+.wave{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.orb{position:absolute;border-radius:50%;background:radial-gradient(circle,currentColor 0%,transparent 70%);
+  opacity:.5;transition:color 1.4s ease,opacity 1s ease;will-change:transform}
+.o1{color:var(--c1);width:110vmax;height:110vmax;left:-55vmax;top:-55vmax;animation:f1 16s ease-in-out infinite alternate}
+.o2{color:var(--c2);width:115vmax;height:115vmax;right:-60vmax;bottom:-55vmax;animation:f2 19s ease-in-out infinite alternate}
+.o3{color:var(--c3);width:90vmax;height:90vmax;left:-10vmax;top:20vh;opacity:.32;animation:f3 23s ease-in-out infinite alternate}
+body.playing .orb{opacity:.75}
+body.playing .o3{opacity:.5}
+@keyframes f1{to{transform:translate(14vw,12vh) scale(1.15)}}
+@keyframes f2{to{transform:translate(-16vw,-14vh) scale(1.12)}}
+@keyframes f3{to{transform:translate(12vw,-10vh) scale(1.2)}}
+.wave::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 50%,rgba(11,11,15,.35),rgba(11,11,15,.82))}
+
+/* ===== Корпус плеера ===== */
+.app{position:relative;z-index:1;width:100%;max-width:400px;height:100vh;height:100dvh;max-height:840px;
+  padding:calc(env(safe-area-inset-top) + 8px) 8px calc(env(safe-area-inset-bottom) + 8px)}
+.card{height:100%;display:flex;flex-direction:column;gap:clamp(6px,1.15vh,10px);padding:14px;border-radius:28px;
+  background:rgba(22,22,30,.84);border:1px solid rgba(255,255,255,.11);
+  -webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px);box-shadow:0 24px 60px rgba(0,0,0,.8);overflow:hidden}
+
+/* шапка */
+.head{flex:none;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--y);box-shadow:0 0 10px var(--y);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.45}}
+.brand small{display:block;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--y);line-height:1}
+.brand b{display:block;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.9);margin-top:3px}
+.hr{display:flex;align-items:center;gap:6px}
+.eq{display:flex;align-items:flex-end;gap:2px;height:16px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.eq i{width:2.5px;height:4px;border-radius:2px;background:var(--y)}
+body.playing .eq i{animation:eqb .6s ease-in-out infinite alternate}
+body.playing .eq i:nth-child(2){animation-duration:.45s;animation-delay:.15s}
+body.playing .eq i:nth-child(3){animation-duration:.7s;animation-delay:.3s}
+@keyframes eqb{from{height:3px}to{height:12px}}
+.round{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:14px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);transition:transform .15s}
+.round:active{transform:scale(.9)}
+
+/* режимы */
+.seg{position:relative;flex:none;display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:12px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.05)}
+.seg button{position:relative;z-index:1;padding:6px 4px;font-size:12px;font-weight:700;color:var(--mut);
+  display:flex;align-items:center;justify-content:center;gap:6px;transition:color .3s}
+.seg button.on{color:#fff}
+.seg .pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:8px;
+  background:rgba(255,255,255,.15);box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .4s cubic-bezier(.3,.8,.25,1)}
+.seg.lyr .pill{transform:translateX(100%)}
+
+/* обложка */
+.stage{position:relative;flex:1 1 0;min-height:110px}
+.halo{position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%);
+  color:var(--c1);background:radial-gradient(closest-side,currentColor,transparent);opacity:.18;
+  transition:color 1.4s,opacity 1s;pointer-events:none;animation:breathe 3.2s ease-in-out infinite}
+body.playing .halo{opacity:.34}
+@keyframes breathe{50%{transform:translate(-50%,-50%) scale(1.07)}}
+.cover{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:240px;height:240px;
+  border-radius:22px;overflow:hidden;background:#1B1528;border:2px solid rgba(255,255,255,.15);
+  box-shadow:0 14px 36px rgba(0,0,0,.65)}
+#art{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:pointer;transition:opacity .45s}
+.cover.lyr #art{opacity:.22}
+.lyrics{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  padding:calc(var(--cs)*.4) calc(var(--cs)*.07);
+  background:linear-gradient(160deg,rgba(35,35,48,.8),rgba(21,21,29,.92));
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 20%,#000 80%,transparent 100%);
+  mask-image:linear-gradient(180deg,transparent 0,#000 20%,#000 80%,transparent 100%);
+  opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s}
+.lyrics::-webkit-scrollbar{display:none}
+.cover.lyr .lyrics{opacity:1;visibility:visible}
+.ln{font-size:calc(var(--cs)*.064);font-weight:800;line-height:1.3;letter-spacing:-.01em;
+  color:rgba(255,255,255,.3);margin-bottom:.75em;cursor:pointer;transition:color .35s,transform .35s;transform-origin:0 50%}
+.ln.past{color:rgba(255,255,255,.55)}
+.ln.on{color:transparent;transform:scale(1.02);
+  background:linear-gradient(90deg,var(--y) 0%,var(--a) calc(var(--k,0%) * .6),var(--p) var(--k,0%),rgba(255,255,255,.45) var(--k,0%));
+  -webkit-background-clip:text;background-clip:text}
+
+/* строка под обложкой */
+.cap{flex:none;min-height:44px;padding:8px 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:10px;
+  text-align:center;cursor:pointer;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);transition:transform .15s,background .2s}
+.cap:active{transform:scale(.99);background:rgba(255,255,255,.09)}
+.cap p{font-size:13px;font-weight:600;line-height:1.35;color:#FFE885;display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden;transition:opacity .25s,transform .25s}
+.cap p.hide{opacity:0;transform:translateY(4px)}
+
+/* трек */
+.meta{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.meta .l{min-width:0;flex:1}
+.badges{display:flex;align-items:center;gap:6px}
+.badge{font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;background:rgba(254,212,43,.2);color:var(--y);text-transform:uppercase}
+.badges span:last-child{font-size:10px;font-weight:500;color:var(--mut)}
+h1{font-size:16px;font-weight:800;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+h1.swap{animation:swap .45s ease}
+@keyframes swap{from{opacity:0;transform:translateY(5px)}}
+.artist{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.like{width:42px;height:42px;flex:none;border-radius:16px;display:grid;place-items:center;font-size:19px;
+  background:rgba(255,75,114,.15);border:1px solid rgba(255,75,114,.35);box-shadow:0 4px 6px rgba(0,0,0,.15);transition:transform .15s}
+.like:active{transform:scale(.88)}
+
+/* таймлайн */
+.prog{flex:none}
+.bar{position:relative;height:18px;display:flex;align-items:center;touch-action:none;cursor:pointer}
+.rail{position:relative;width:100%;height:5px;border-radius:999px;background:rgba(255,255,255,.15);overflow:hidden;transition:height .2s}
+.bar.drag .rail{height:7px}
+.fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:999px;background:linear-gradient(90deg,var(--y),var(--a),var(--p))}
+.thumb{position:absolute;top:50%;left:0;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--y);
+  box-shadow:0 0 10px rgba(254,212,43,.95);transition:transform .15s}
+.bar.drag .thumb{transform:scale(1.3)}
+.times{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:600;color:var(--mut);font-variant-numeric:tabular-nums}
+.times b{color:rgba(254,212,43,.9);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+
+/* управление */
+.ctrl{flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 6px}
+.mini{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:rgba(255,255,255,.05);transition:transform .15s,background .2s}
+.mini:active{transform:scale(.88);background:rgba(255,255,255,.12)}
+.ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;transition:transform .15s,background .2s}
+.ic svg{width:26px;height:26px}
+.ic:active{transform:scale(.9);background:rgba(255,255,255,.1)}
+.play{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;background:var(--y);color:#000;
+  box-shadow:0 0 26px rgba(254,212,43,.55);transition:transform .15s,background .2s}
+.play:active{transform:scale(.92);background:var(--yh)}
+.play svg{width:30px;height:30px}
+.play .pa{display:none}
+body.playing .play .pa{display:block}
+body.playing .play .pl{display:none}
+
+/* плейлист */
+.list{flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.list button{padding:8px 6px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.75);transition:all .25s}
+.list button.on{background:rgba(254,212,43,.2);border-color:var(--y);color:var(--y)}
+.list button:active{transform:scale(.95)}
+
+.letterBtn{flex:none;width:100%;padding:11px 12px;border-radius:16px;font-weight:800;font-size:13px;color:#000;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  background:linear-gradient(90deg,var(--y),#FFB32B,var(--a));box-shadow:0 10px 15px -3px rgba(0,0,0,.25);transition:transform .15s}
+.letterBtn:active{transform:scale(.98)}
+
+@media (max-height:700px){
+  .card{padding:12px;gap:7px}.brand b{font-size:11px}
+  .play{width:54px;height:54px}.play svg{width:27px;height:27px}
+  .like{width:38px;height:38px}.cap{min-height:40px;padding:6px 12px}.cap p{font-size:12px}
+  .letterBtn{padding:10px}
+}
+@media (max-height:590px){
+  .app{padding-top:calc(env(safe-area-inset-top) + 4px);padding-bottom:calc(env(safe-area-inset-bottom) + 4px)}
+  .badges{display:none}.seg button{padding:5px 4px}.mini{width:34px;height:34px}.ic{width:40px;height:40px}
+  .play{width:50px;height:50px}.list button{padding:7px 4px}
+}
+
+/* ===== Надпись сверху ===== */
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 12px);z-index:80;transform:translate(-50%,-10px);
+  display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:16px;white-space:nowrap;
+  font-size:12.5px;font-weight:600;background:rgba(31,31,43,.95);border:1px solid rgba(254,212,43,.4);
+  box-shadow:0 25px 50px -12px rgba(0,0,0,.5);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);
+  opacity:0;pointer-events:none;transition:opacity .3s,transform .35s cubic-bezier(.2,.9,.3,1.2)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ===== Салют ===== */
+#fx{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden}
+.fx{position:absolute;line-height:1;width:1em;height:1em;margin:-.5em 0 0 -.5em;text-align:center;will-change:transform,opacity}
+
+/* ===== Записка ===== */
+.modal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;
+  background:rgba(0,0,0,.8);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  opacity:0;pointer-events:none;transition:opacity .3s}
+.modal.open{opacity:1;pointer-events:auto}
+.lcard{position:relative;width:100%;max-width:380px;max-height:calc(100dvh - 32px);overflow-y:auto;border-radius:28px;padding:20px;
+  background:linear-gradient(180deg,#232330,#15151D);border:1px solid rgba(254,212,43,.4);box-shadow:0 25px 70px rgba(0,0,0,.9);
+  transform:scale(.95);transition:transform .3s cubic-bezier(.2,.9,.3,1.1);-webkit-user-select:text;user-select:text}
+.modal.open .lcard{transform:scale(1)}
+.x{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);font-size:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;margin-bottom:10px;font-size:11px;font-weight:700;
+  background:rgba(254,212,43,.15);border:1px solid rgba(254,212,43,.3);color:var(--y)}
+.lcard h2{font-size:19px;font-weight:900;line-height:1.25;padding-right:30px}
+.ltxt{margin-top:12px;font-size:13.5px;line-height:1.62;color:rgba(255,255,255,.9)}
+.ltxt p{margin-bottom:10px}
+.ltxt strong{color:var(--y)}
+.ltxt .box{padding:10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--y);font-weight:500}
+.lfoot{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lfoot small{display:block;font-size:11px;color:var(--mut)}
+.lfoot b{font-size:14px;font-weight:800}
+#hugBack{padding:10px 16px;border-radius:12px;background:var(--y);color:#000;font-weight:800;font-size:12.5px;white-space:nowrap;transition:transform .15s}
+#hugBack:active{transform:scale(.95)}
+</style>
+</head>
+<body>
+
+<div class="wave" aria-hidden="true"><i class="orb o1"></i><i class="orb o2"></i><i class="orb o3"></i></div>
+
+<div class="toast" id="toast"><span id="toastIcon">💛</span><span id="toastText">Для моей родной Кисы</span></div>
+
+<main class="app">
+ <div class="card">
+  <header class="head">
+    <div class="brand"><span class="dot"></span><div><small>Моя волна</small><b>Поток: «Для моей Кисы» 🐾</b></div></div>
+    <div class="hr">
+      <div class="eq"><i></i><i></i><i></i></div>
+      <button class="round" id="soundBtn" aria-label="Включить или выключить мелодию">🔔</button>
+    </div>
+  </header>
+
+  <div class="seg" id="seg">
+    <span class="pill"></span>
+    <button data-m="art" class="on"><span>🎨</span><span>Наш Пиксель-арт</span></button>
+    <button data-m="lyr"><span>💬</span><span>Текст</span></button>
+  </div>
+
+  <section class="stage" id="stage">
+    <div class="halo"></div>
+    <div class="cover" id="cover">
+      <canvas id="art" aria-label="Пиксельная картинка по нашей фотографии"></canvas>
+      <div class="lyrics" id="lyrics"></div>
+    </div>
+  </section>
+
+  <div class="cap" id="cap" title="Нажми, чтобы открыть весь текст"><p id="capText"></p></div>
+
+  <div class="meta">
+    <div class="l">
+      <div class="badges"><span class="badge" id="badge">Трек 1/3</span><span>Личный плейлист</span></div>
+      <h1 id="title"></h1>
+      <p class="artist" id="artist"></p>
+    </div>
+    <button class="like" id="likeBtn" aria-label="Отправить сердечки">❤️</button>
+  </div>
+
+  <div class="prog">
+    <div class="bar" id="bar"><div class="rail"><div class="fill" id="fill"></div></div><div class="thumb" id="thumb"></div></div>
+    <div class="times"><span id="tcur">0:00</span><b id="tname"></b><span id="tdur">0:00</span></div>
+  </div>
+
+  <div class="ctrl">
+    <button class="mini" id="hugBtn" aria-label="Обнять Кису">🐾</button>
+    <button class="ic" id="prev" aria-label="Предыдущий трек"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
+    <button class="play" id="play" aria-label="Старт / пауза">
+      <svg class="pl" viewBox="0 0 24 24"><path fill="currentColor" d="M8.5 5.5v13a1 1 0 0 0 1.5.86l10-6.5a1 1 0 0 0 0-1.72l-10-6.5a1 1 0 0 0-1.5.86z"/></svg>
+      <svg class="pa" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+    </button>
+    <button class="ic" id="next" aria-label="Следующий трек"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+    <button class="mini" id="fallBtn" aria-label="Тёплая осень">🍂</button>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <button class="letterBtn" id="letterBtn"><span>💌</span><span>Открыть личную записку от Тимура</span></button>
+ </div>
+</main>
+
+<div id="fx"></div>
+
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="lcard" role="dialog" aria-label="Записка от Тимура">
+    <button class="x" id="closeM" aria-label="Закрыть">✕</button>
+    <div class="chip"><span>🐾</span><span>Лично для тебя</span></div>
+    <h2>Моей любимой Кисе — Олесе 💛</h2>
+    <div class="ltxt">
+      <p>Доброе утро и самого тёплого тебе дня, моя родная.</p>
+      <p>Я знаю, что сейчас осень и поиск новой работы иногда навевают грусть и усталость. Но я хочу, чтобы ты помнила: <strong>ты невероятно умная, талантливая и светлая</strong>.</p>
+      <p>Твоя работа обязательно найдёт тебя, а все паузы нужны только для того, чтобы ты попала туда, где тебя будут ценить по-настоящему.</p>
+      <p class="box">Не хандри, моя Киса. Я всегда рядом, крепко тебя обнимаю (прямо как на нашей фотке), очень в тебя верю и безумно люблю.</p>
+    </div>
+    <div class="lfoot">
+      <div><small>Всегда твой</small><b>Тимур ❤️</b></div>
+      <button id="hugBack">Обнять в ответ 🤗💛</button>
+    </div>
+  </div>
+</div>
+
+<audio id="audio" playsinline webkit-playsinline loop preload="auto"></audio>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>Array.prototype.slice.call(document.querySelectorAll(s));
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const rnd=Math.random;
+
+/* =========================================================
+   ТРЕКИ
+   ========================================================= */
+const TRACKS=[
+  { tab:'1. Утро, Киса', badge:'Трек 1/3', title:'Доброе утро, Киса', artist:'Тимур • Для Олеси', name:'Доброе утро',
+    bpm:84, bars:14,
+    chords:[[72,'M'],[67,'M'],[69,'m'],[65,'M']],
+    mel:[[[0,3],[2,2]],[[0,2],[1,3],[3,1]],[[0,3],[2.5,2]],[[0,1],[2,2],[3,3]]],
+    colors:['#FED42B','#FF8C42','#FF4B72'],
+    lines:[
+      'Доброе утро, моя родная.',
+      'Знаю, как непросто вставать, когда за окном хмурая осень,',
+      'поэтому просто хочу напомнить тебе с самого утра,',
+      'как сильно я тобой дорожу и как рад, что ты у меня есть.',
+      'Пусть этот день пройдёт спокойно и бережно к тебе.',
+      'Улыбнись, пожалуйста. Хорошего тебе дня, Киса.'
+    ]},
+  { tab:'2. Верю в тебя', badge:'Трек 2/3', title:'Я в тебя очень верю', artist:'Тимур • О самом важном', name:'Верю в тебя',
+    bpm:76, bars:15,
+    chords:[[69,'m'],[65,'M'],[72,'M'],[67,'M']],
+    mel:[[[0,3]],[[0,2],[2,3]],[[0,3],[2,1]],[[1,2],[3,3]]],
+    colors:['#A855F7','#EC4899','#FED42B'],
+    lines:[
+      'Я вижу, как ты переживаешь из-за поиска новой работы,',
+      'и как эта осенняя усталость порой накрывает.',
+      'Мне очень хочется забрать у тебя хотя бы часть этих тревог.',
+      'Ты умная, живая, настоящая и очень талантливая.',
+      'Все эти паузы и ожидания — просто этап перед твоим местом,',
+      'где тебя будут ценить по-настоящему.',
+      'Не грусти, моя Киса. Я рядом с тобой в любую погоду.'
+    ]},
+  { tab:'3. Рядом с тобой', badge:'Трек 3/3', title:'Рядом с тобой', artist:'Тимур • Люблю тебя', name:'Рядом с тобой',
+    bpm:70, bars:12,
+    chords:[[65,'M'],[62,'m'],[70,'M'],[72,'M']],
+    mel:[[[0,3],[2,2]],[[0,2]],[[0,3],[2,1]],[[1,3],[3,2]]],
+    colors:['#FF4B72','#FED42B','#3B82F6'],
+    lines:[
+      'Когда ты рядом и вот так просто гладишь меня по голове,',
+      'мне больше ничего не нужно — всё сразу встаёт на свои места.',
+      'В тебе столько тепла, что с тобой не страшна никакая осень.',
+      'Спасибо тебе за твою нежность, за твою улыбку и за нас.',
+      'Олеся, родная, я тебя очень сильно люблю.',
+      'Всегда твой Тимур.'
+    ]}
+];
+
+const SR=22050;
+let accS=0;
+TRACKS.forEach(T=>{
+  T.bar=240/T.bpm;
+  T.len=Math.round(T.bars*T.bar*SR);
+  T.dur=T.len/SR;
+  T.s0=accS; T.start=accS/SR; accS+=T.len;
+  const n=T.lines.length, intro=T.bar*.5, outro=T.bar, step=(T.dur-intro-outro)/n;
+  T.times=T.lines.map((_,i)=>intro+i*step);
+});
+const TOTAL_LEN=accS, TOTAL=accS/SR;
+
+/* =========================================================
+   АУДИО-ДВИЖОК: синтез музыкальной шкатулки -> WAV -> <audio>
+   ========================================================= */
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function osc(out,f,amp,tau){
+  if(f>=SR*.45) return;
+  const w=2*Math.PI*f/SR, cw=Math.cos(w), sw=Math.sin(w), d=Math.exp(-1/(tau*SR)), n=out.length;
+  let re=1, im=0, a=amp;
+  for(let i=0;i<n;i++){ out[i]+=a*im; const r=re*cw-im*sw; im=re*sw+im*cw; re=r; a*=d; }
+}
+const cache=new Map();
+function box(m){
+  const key='b'+m; let o=cache.get(key); if(o) return o;
+  const f=mtof(m), k=Math.pow(440/f,.3);
+  o=new Float32Array(Math.floor(SR*2.6));
+  osc(o,f,1,1.35*k); osc(o,f*2,.3,.6*k); osc(o,f*3,.1,.3*k); osc(o,f*4.2,.045,.14*k); osc(o,f*5.4,.02,.07*k);
+  const at=Math.floor(SR*.003); for(let i=0;i<at;i++) o[i]*=i/at;
+  const ft=Math.floor(SR*.15); for(let i=0;i<ft;i++) o[o.length-1-i]*=i/ft;
+  cache.set(key,o); return o;
+}
+function bass(m,dur){
+  const key='s'+m+'_'+dur.toFixed(3); let o=cache.get(key); if(o) return o;
+  const f=mtof(m), n=Math.floor(SR*(dur+1));
+  o=new Float32Array(n);
+  osc(o,f,1,2.2); osc(o,f*2,.35,1); osc(o,f*3,.08,.5);
+  const atk=SR*.06, rel=Math.floor(dur*SR);
+  for(let i=0;i<n;i++){ let e=1-Math.exp(-i/atk); if(i>rel) e*=Math.exp(-(i-rel)/(SR*.22)); o[i]*=e; }
+  cache.set(key,o); return o;
+}
+function pad(m,dur){
+  const key='p'+m+'_'+dur.toFixed(3); let o=cache.get(key); if(o) return o;
+  const f=mtof(m), n=Math.floor(SR*(dur+.8));
+  o=new Float32Array(n);
+  osc(o,f,1,30); osc(o,f*1.004,.7,30); osc(o,f*2,.12,30);
+  const atk=SR*.5, rel=Math.floor(dur*SR);
+  for(let i=0;i<n;i++){ let e=i<atk?Math.pow(Math.sin(i/atk*Math.PI/2),2):1; if(i>rel) e*=Math.exp(-(i-rel)/(SR*.25)); o[i]*=e; }
+  cache.set(key,o); return o;
+}
+function reverb(x){
+  const n=x.length, wet=new Float32Array(n);
+  [1116,1188,1277,1356].forEach(d0=>{
+    const d=Math.floor(d0*.5*1.6), b=new Float32Array(d); let idx=0, lp=0;
+    for(let i=0;i<n;i++){ const y=b[idx]; lp=y*.6+lp*.4; b[idx]=x[i]+lp*.78; if(++idx===d) idx=0; wet[i]+=y; }
+  });
+  [556,441].forEach(d0=>{
+    const d=Math.floor(d0*.5), b=new Float32Array(d); let idx=0;
+    for(let i=0;i<n;i++){ const bo=b[idx], inp=wet[i]; wet[i]=-inp+bo; b[idx]=inp+bo*.5; if(++idx===d) idx=0; }
+  });
+  for(let i=0;i<n;i++) x[i]=x[i]*.82+wet[i]*.11;
+}
+function renderTrack(T,idx){
+  const L=T.len, buf=new Float32Array(L), r=rng(101+idx*17), beat=T.bar/4;
+  const add=(src,t,gain)=>{ let s0=Math.round(t*SR); if(s0<0) s0=0; const n=Math.min(src.length,L-s0); for(let i=0;i<n;i++) buf[s0+i]+=src[i]*gain; };
+  for(let b=0;b<T.bars;b++){
+    const last=b===T.bars-1;
+    const ch=last?T.chords[0]:T.chords[b%T.chords.length];
+    const root=ch[0], iv=ch[1]==='m'?[0,3,7,12,15]:[0,4,7,12,16], v=iv.map(x=>root+x), t0=b*T.bar;
+    add(bass(48+(root%12),T.bar*(last?1.4:.98)),t0,.34);
+    add(pad(v[1]-12,T.bar),t0,.035); add(pad(v[2]-12,T.bar),t0,.03);
+    if(last){ for(let j=0;j<4;j++) add(box(v[j]),t0+j*.09,.4); add(box(v[3]+12),t0+.6,.22); continue; }
+    const pat=b===0?[0,-1,1,-1,2,-1,3,-1]:(b%8<4?[0,2,1,2,3,2,1,2]:[0,2,3,4,3,2,1,3]);
+    for(let j=0;j<8;j++){ if(pat[j]<0) continue; add(box(v[pat[j]]),t0+j*beat/2+(r()-.5)*.01,(j%2?.24:.34)*(.88+r()*.24)); }
+    if(b>=4){ const mel=T.mel[b%T.mel.length]; for(let q=0;q<mel.length;q++) add(box(v[mel[q][1]]+12),t0+mel[q][0]*beat,.19); }
+  }
+  reverb(buf);
+  const a=Math.exp(-2*Math.PI*5500/SR); let y=0;
+  for(let i=0;i<L;i++){ y=(1-a)*buf[i]+a*y; buf[i]=y; }
+  const fi=Math.floor(SR*.02), fo=Math.floor(SR*1.6);
+  for(let i=0;i<fi;i++) buf[i]*=i/fi;
+  for(let i=0;i<fo;i++) buf[L-1-i]*=Math.pow(i/fo,1.5);
+  return buf;
+}
+function toWav(f32){
+  const n=f32.length, ab=new ArrayBuffer(44+n*2), dv=new DataView(ab);
+  const ws=(o,s)=>{for(let i=0;i<s.length;i++) dv.setUint8(o+i,s.charCodeAt(i));};
+  ws(0,'RIFF'); dv.setUint32(4,36+n*2,true); ws(8,'WAVE'); ws(12,'fmt ');
+  dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,1,true);
+  dv.setUint32(24,SR,true); dv.setUint32(28,SR*2,true); dv.setUint16(32,2,true); dv.setUint16(34,16,true);
+  ws(36,'data'); dv.setUint32(40,n*2,true);
+  const pcm=new Int16Array(ab,44,n);
+  for(let i=0;i<n;i++){ const s=clamp(f32[i],-1,1); pcm[i]=s<0?s*32768:s*32767; }
+  return ab;
+}
+
+const audio=$('#audio');
+let audioReady=false, metaReady=false, pendingAbs=0;
+function buildAudio(){
+  if(audioReady) return;
+  audioReady=true;
+  const all=new Float32Array(TOTAL_LEN);
+  TRACKS.forEach((T,i)=>all.set(renderTrack(T,i),T.s0));
+  let peak=0; for(let i=0;i<all.length;i++){ const v=Math.abs(all[i]); if(v>peak) peak=v; }
+  const g=peak>0?.86/peak:1; for(let i=0;i<all.length;i++) all[i]*=g;
+  audio.src=URL.createObjectURL(new Blob([toWav(all)],{type:'audio/wav'}));
+  try{ audio.load(); }catch(e){}
+}
+audio.addEventListener('loadedmetadata',()=>{ metaReady=true; try{ if(Math.abs(audio.currentTime-pendingAbs)>.05) audio.currentTime=pendingAbs; }catch(e){} });
+function getAbs(){ return metaReady?audio.currentTime:pendingAbs; }
+function seekAbs(a){ a=clamp(a,0,TOTAL-.05); pendingAbs=a; if(metaReady){ try{ audio.currentTime=a; }catch(e){} } }
+function audioSession(){ try{ if(navigator.audioSession && navigator.audioSession.type!=='playback') navigator.audioSession.type='playback'; }catch(e){} }
+function play(){
+  buildAudio(); audioSession();
+  const p=audio.play();
+  if(p && p.catch) p.catch(()=>{ document.body.classList.remove('playing'); toast('Коснись ▶ ещё раз','🎵'); });
+}
+audio.addEventListener('play',()=>{ document.body.classList.add('playing'); msPos(); });
+audio.addEventListener('playing',()=>document.body.classList.add('playing'));
+audio.addEventListener('pause',()=>{ document.body.classList.remove('playing'); msPos(); });
+
+/* =========================================================
+   ИНТЕРФЕЙС
+   ========================================================= */
+const seg=$('#seg'), cover=$('#cover'), stage=$('#stage'), lyr=$('#lyrics'), capText=$('#capText'),
+      titleEl=$('#title'), artistEl=$('#artist'), badgeEl=$('#badge'), listEl=$('#list'),
+      bar=$('#bar'), fill=$('#fill'), thumb=$('#thumb'), tcur=$('#tcur'), tdur=$('#tdur'), tname=$('#tname');
+let cur=-1, lineIdx=-2, lineEls=[], mode='art', dragging=false, dragRatio=0, capTimer=0;
+const fmt=s=>{ s=Math.max(0,Math.floor(s)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+
+const listBtns=TRACKS.map((T,i)=>{
+  const b=document.createElement('button'); b.textContent=T.tab;
+  b.addEventListener('click',()=>{ selectTrack(i,true); msPos(); });
+  listEl.appendChild(b); return b;
+});
+
+function trackAt(abs){ for(let i=TRACKS.length-1;i>=0;i--) if(abs>=TRACKS[i].start-.02) return i; return 0; }
+
+function selectTrack(i,seek){
+  const T=TRACKS[i], changed=i!==cur;
+  cur=i;
+  if(seek) seekAbs(T.start);
+  if(!changed) return;
+  listBtns.forEach((b,k)=>b.classList.toggle('on',k===i));
+  titleEl.textContent=T.title; titleEl.classList.remove('swap'); void titleEl.offsetWidth; titleEl.classList.add('swap');
+  artistEl.textContent=T.artist; badgeEl.textContent=T.badge; tname.textContent=T.name; tdur.textContent=fmt(T.dur);
+  const rs=document.documentElement.style;
+  rs.setProperty('--c1',T.colors[0]); rs.setProperty('--c2',T.colors[1]); rs.setProperty('--c3',T.colors[2]);
+  renderLyrics(); lineIdx=-2; msMeta();
+}
+function renderLyrics(){
+  const T=TRACKS[cur];
+  lyr.innerHTML='';
+  lineEls=T.lines.map((s,i)=>{
+    const p=document.createElement('p'); p.className='ln'; p.textContent=s;
+    p.addEventListener('click',e=>{ seekAbs(T.start+T.times[i]+.01); if(audio.paused) play(); msPos(); burstAt(['💛','🐾','✨'],e.clientX,e.clientY,8); });
+    lyr.appendChild(p); return p;
+  });
+  lyr.scrollTop=0;
+}
+function scrollToLine(li,smooth){
+  const el=lineEls[Math.max(li,0)]; if(!el) return;
+  const top=el.offsetTop-lyr.clientHeight/2+el.offsetHeight/2;
+  try{ lyr.scrollTo({top:top,behavior:smooth?'smooth':'auto'}); }catch(e){ lyr.scrollTop=top; }
+}
+function setLine(li){
+  const T=TRACKS[cur];
+  lineEls.forEach((el,i)=>{ el.classList.toggle('past',i<li); el.classList.toggle('on',i===li); if(i!==li) el.style.removeProperty('--k'); });
+  const txt=T.lines[Math.max(li,0)];
+  if(capText.textContent!==txt){
+    capText.classList.add('hide'); clearTimeout(capTimer);
+    capTimer=setTimeout(()=>{ capText.textContent=txt; capText.classList.remove('hide'); },170);
+  }
+  if(mode==='lyr') scrollToLine(li,true);
+}
+function ui(){
+  const abs=getAbs();
+  if(!dragging){ const k=trackAt(abs); if(k!==cur) selectTrack(k,false); }
+  const T=TRACKS[cur];
+  const rel=clamp(dragging?dragRatio*T.dur:abs-T.start,0,T.dur);
+  const pc=(rel/T.dur*100).toFixed(2)+'%';
+  fill.style.width=pc; thumb.style.left=pc;
+  tcur.textContent=fmt(rel);
+  let li=-1; for(let i=0;i<T.times.length;i++) if(rel>=T.times[i]) li=i;
+  if(li!==lineIdx){ lineIdx=li; setLine(li); }
+  if(li>=0 && lineEls[li]){
+    const st=T.times[li], en=li+1<T.times.length?T.times[li+1]:T.dur-T.bar;
+    const k=clamp((rel-st)/((en-st)*.85),0,1);
+    lineEls[li].style.setProperty('--k',(k*100).toFixed(1)+'%');
+  }
+}
+
+function setMode(m){
+  mode=m;
+  cover.classList.toggle('lyr',m==='lyr'); seg.classList.toggle('lyr',m==='lyr');
+  $$('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  if(m==='lyr') scrollToLine(lineIdx,false);
+}
+$$('#seg button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+$('#cap').addEventListener('click',()=>setMode(mode==='lyr'?'art':'lyr'));
+
+function next(){ selectTrack((cur+1)%TRACKS.length,true); msPos(); }
+function prev(){ if(getAbs()-TRACKS[cur].start>3) seekAbs(TRACKS[cur].start); else selectTrack((cur+TRACKS.length-1)%TRACKS.length,true); msPos(); }
+$('#play').addEventListener('click',e=>{
+  if(audio.paused){ play(); burst(['💛','🐾','❤️'],e.currentTarget,14); }
+  else audio.pause();
+});
+$('#next').addEventListener('click',next);
+$('#prev').addEventListener('click',prev);
+
+// таймлайн
+function dragMove(e){ const r=bar.getBoundingClientRect(); dragRatio=clamp((e.clientX-r.left)/r.width,0,1); }
+bar.addEventListener('pointerdown',e=>{ dragging=true; try{bar.setPointerCapture(e.pointerId);}catch(_){} bar.classList.add('drag'); dragMove(e); });
+bar.addEventListener('pointermove',e=>{ if(dragging) dragMove(e); });
+function dragEnd(){ if(!dragging) return; dragging=false; bar.classList.remove('drag'); const T=TRACKS[cur]; seekAbs(T.start+Math.min(dragRatio*T.dur,T.dur-.1)); msPos(); }
+bar.addEventListener('pointerup',dragEnd); bar.addEventListener('pointercancel',dragEnd);
+
+// звук вкл/выкл
+const soundBtn=$('#soundBtn');
+soundBtn.addEventListener('click',()=>{
+  audio.muted=!audio.muted;
+  soundBtn.textContent=audio.muted?'🔕':'🔔';
+  toast(audio.muted?'Мелодия выключена':'Мелодия включена',audio.muted?'🔇':'🔔');
+});
+
+// экран блокировки / пульт
+let artURL='';
+function msMeta(){
+  if(!('mediaSession' in navigator) || cur<0) return;
+  try{ navigator.mediaSession.metadata=new MediaMetadata({title:TRACKS[cur].title,artist:'Тимур',album:'Для моей Кисы',
+    artwork:artURL?[{src:artURL,sizes:'288x288',type:'image/png'}]:[]}); }catch(e){}
+}
+function msPos(){
+  if(!('mediaSession' in navigator) || cur<0) return;
+  const T=TRACKS[cur];
+  try{ navigator.mediaSession.setPositionState({duration:T.dur,playbackRate:1,position:clamp(getAbs()-T.start,0,T.dur)}); }catch(e){}
+}
+if('mediaSession' in navigator){
+  const h=(a,f)=>{ try{ navigator.mediaSession.setActionHandler(a,f); }catch(e){} };
+  h('play',play); h('pause',()=>audio.pause()); h('previoustrack',prev); h('nexttrack',next);
+  h('seekto',d=>{ if(d && d.seekTime!=null){ seekAbs(TRACKS[cur].start+d.seekTime); msPos(); } });
+}
+
+// надпись сверху
+let toastT=0;
+function toast(text,icon){
+  const t=$('#toast'); $('#toastText').textContent=text; $('#toastIcon').textContent=icon||'💛';
+  t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// салют из эмодзи
+const fxLayer=$('#fx');
+function burstAt(list,x0,y0,n){
+  for(let i=0;i<n;i++){
+    const s=document.createElement('span'); s.className='fx';
+    s.textContent=list[Math.floor(rnd()*list.length)];
+    s.style.left=x0+'px'; s.style.top=y0+'px'; s.style.fontSize=(18+rnd()*16)+'px';
+    fxLayer.appendChild(s);
+    if(!s.animate){ setTimeout(()=>s.remove(),50); continue; }
+    const dx=(rnd()-.5)*300, dy=-(220+rnd()*420), rot=(rnd()-.5)*540, sc=.8+rnd()*.7;
+    const an=s.animate([
+      {transform:'translate(0,0) scale(.2)',opacity:0},
+      {transform:'translate('+dx*.25+'px,'+dy*.3+'px) scale('+sc+')',opacity:1,offset:.18},
+      {transform:'translate('+dx+'px,'+dy+'px) rotate('+rot+'deg) scale('+sc*.85+')',opacity:0}
+    ],{duration:1500+rnd()*900,delay:i*16,easing:'cubic-bezier(.2,.7,.3,1)',fill:'both'});
+    an.onfinish=()=>s.remove();
+  }
+}
+function burst(list,el,n){ const r=el.getBoundingClientRect(); burstAt(list,r.left+r.width/2,r.top+r.height/2,n); }
+
+$('#likeBtn').addEventListener('click',e=>{ burst(['❤️','💛','🐾','💖'],e.currentTarget,22); toast('Очень сильно тебя люблю, родная ❤️','❤️'); heartBoost=1.8; spawnMinis(6); });
+$('#hugBtn').addEventListener('click',e=>{ burst(['🐾','💛','🤗','🐱'],e.currentTarget,20); toast('Крепко обнимаю свою Кису 🐾','🤗'); spawnMinis(3); });
+$('#fallBtn').addEventListener('click',e=>{ burst(['🍂','☕','✨','💛','🍁'],e.currentTarget,20); toast('Я рядом с тобой в любую погоду 🍂','💛'); addLeaves(10); });
+
+// записка
+const modal=$('#modal');
+function openM(){ modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); burstAt(['💌','❤️','💛'],innerWidth/2,innerHeight/2,20); }
+function closeM(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
+$('#letterBtn').addEventListener('click',openM);
+$('#closeM').addEventListener('click',closeM);
+$('#hugBack').addEventListener('click',e=>{ burst(['🤗','❤️','🐾','💛'],e.currentTarget,26); toast('Крепко-крепко обнимаю тебя, Киса ❤️','🤗'); setTimeout(closeM,450); });
+modal.addEventListener('click',e=>{ if(e.target===modal) closeM(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeM(); if(e.key===' '&&!modal.classList.contains('open')){ e.preventDefault(); $('#play').click(); } });
+document.addEventListener('gesturestart',e=>e.preventDefault());
+
+/* =========================================================
+   ПИКСЕЛЬ-АРТ 96×96 по нашей фотографии
+   ========================================================= */
+const LOW=96;
+const low=document.createElement('canvas'); low.width=low.height=LOW;
+const g=low.getContext('2d');
+const view=$('#art'), vctx=view.getContext('2d');
+function px(x,y,w,h,c){ g.fillStyle=c; g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); }
+
+let extra=[], minis=[], heartBoost=0, miniClock=0;
+function addLeaves(n){ for(let i=0;i<n;i++) extra.push({x:rnd()*96-6,y:-4-rnd()*40,vy:12+rnd()*10,vx:3+rnd()*5,ph:rnd()*6.28,c:['#E85D1A','#FF9E2C','#FED42B','#D2553A'][Math.floor(rnd()*4)]}); }
+function spawnMinis(n){ for(let i=0;i<n;i++) minis.push({x:45+rnd()*2,y:15,vx:(rnd()-.5)*12,vy:-(8+rnd()*8),life:1.4+rnd()*.6}); }
+
+function drawCouple(tick,t){
+  // 1. Уютная комната и осеннее окно
+  px(0,0,96,96,'#3B2014');
+  for(let y=0;y<56;y+=6) px(0,y,96,1,'#2A150C');
+  px(28,0,48,46,'#4E2A16');
+  px(31,2,42,42,'#FFD280');
+  px(31,2,42,16,'#FFAE52');
+  px(52,2,21,24,'#E05A19');
+  px(56,4,17,18,'#F57D20');
+  px(46,6,12,12,'#F29F33');
+  px(51,2,2,42,'#4E2A16');
+  px(31,22,42,2,'#4E2A16');
+  // полка с тыковками
+  px(80,18,16,28,'#29140B'); px(82,20,14,24,'#4A2716');
+  px(84,13,8,5,'#EB681C'); px(86,11,2,2,'#4A6B3B'); px(84,34,9,6,'#EB681C');
+  // растение и гирлянда
+  px(2,14,10,8,'#8C4828'); px(1,10,12,5,'#4E7A38'); px(4,8,8,4,'#689C4B');
+  const glow=(Math.floor(tick/4)%2===0)?'#FFF3A1':'#FFBA42';
+  const glow2=(Math.floor(tick/4)%2===0)?'#FFBA42':'#FFF3A1';
+  px(10,6,2,2,glow); px(22,4,2,2,glow2); px(76,5,2,2,glow); px(88,9,2,2,glow2);
+  // спинка кресла
+  px(44,24,34,28,'#2C303A'); px(46,26,30,24,'#383D4A');
+
+  // 2. Олеся
+  px(6,10,44,52,'#A87943'); px(8,8,40,48,'#C79658'); px(10,6,34,10,'#DFB172'); px(14,5,24,6,'#F0C88B');
+  px(22,42,12,10,'#DFA382'); px(21,49,14,9,'#F2ECE1'); px(23,50,2,7,'#D8CFC0'); px(27,50,2,7,'#D8CFC0');
+  px(0,50,52,46,'#7A7D85'); px(14,48,26,8,'#8C9099');
+  px(0,58,16,38,'#EE2B7B'); px(4,64,18,32,'#FF3E8E'); px(34,66,16,30,'#EE2B7B');
+  px(0,72,12,24,'#1A2136'); px(8,78,12,18,'#232C47');
+  px(28,52,2,44,'#C7C2BA'); px(27,74,4,6,'#E6E2DC');
+  px(15,15,26,28,'#F4BE9C'); px(17,13,22,31,'#FAD0B4'); px(20,43,16,3,'#FAD0B4');
+  px(17,21,7,2,'#6E4B32'); px(30,19,7,2,'#6E4B32');
+  // моргание
+  const blinkO=(t%4.2)<.13;
+  if(blinkO){ px(18,25,5,1,'#2D3830'); px(31,23,5,1,'#2D3830'); }
+  else { px(18,24,5,3,'#2D3830'); px(31,22,5,3,'#2D3830'); px(19,24,2,2,'#FFFFFF'); px(32,22,2,2,'#FFFFFF'); }
+  px(26,26,3,6,'#E3A788'); px(25,31,5,2,'#D99A79');
+  px(16,29,4,3,'#F29B91'); px(35,27,4,3,'#F29B91');
+  px(20,35,14,2,'#A84A4A'); px(22,37,10,2,'#C25E5E'); px(19,34,2,2,'#A84A4A'); px(33,33,2,2,'#A84A4A');
+  px(5,16,10,44,'#D9AC6B'); px(7,20,7,42,'#F0C989'); px(9,32,8,34,'#C49252');
+  px(39,16,9,36,'#D9AC6B'); px(37,28,8,30,'#F0C989');
+
+  // 3. Тимур (её рука с белым маникюром гладит его по голове)
+  const st=Math.round(Math.sin(t*1.7));
+  px(56+st,27,24,7,'#FAD0B4'); px(60+st,25,16,3,'#F4BE9C');
+  px(76,29,10,16,'#F4BE9C'); px(80,42,12,12,'#7A7D85');
+  px(53+st,27,3,2,'#FFFFFF'); px(55+st,30,3,2,'#FFFFFF'); px(58+st,25,3,2,'#FFFFFF');
+  px(49,29,32,14,'#241A16'); px(52,28,26,8,'#362721');
+  px(56+st,27,24,3,'#FAD0B4'); px(60+st,25,16,2,'#F4BE9C');
+  px(53+st,27,3,2,'#FFFFFF'); px(58+st,25,3,2,'#FFFFFF');
+  px(48,36,32,30,'#F0B896'); px(50,35,28,32,'#F7C5A6'); px(79,46,4,8,'#E3A685');
+  px(51,43,9,2,'#2E221D'); px(65,43,9,2,'#2E221D');
+  const blinkT=((t+1.7)%5)<.13;
+  if(blinkT){ px(53,47,6,1,'#2B1E1A'); px(66,47,6,1,'#2B1E1A'); }
+  else { px(53,46,6,3,'#2B1E1A'); px(66,46,6,3,'#2B1E1A'); px(54,46,2,1,'#FFFFFF'); px(67,46,2,1,'#FFFFFF'); }
+  px(60,48,5,6,'#DE9F7E'); px(59,53,7,2,'#CE8E6D');
+  px(55,56,15,2,'#E3A88C'); px(56,58,13,2,'#C96E77'); px(58,60,9,2,'#DF868F');
+  px(54,66,20,10,'#E0A484');
+  px(44,68,52,28,'#0B57D0'); px(48,66,10,12,'#1B6EF3'); px(72,66,12,12,'#1B6EF3');
+  px(82,70,14,3,'#FFFFFF'); px(56,73,18,23,'#A8CCFF'); px(54,72,2,24,'#9499A1');
+
+  // 4. Листья за окном и сердечко
+  const leaves=[
+    {x:35+Math.sin(tick*.2)*2,y:(tick*1.2+4)%40,c:'#E85D1A'},
+    {x:64+Math.cos(tick*.2)*2,y:(tick*1.2+19)%40,c:'#FF9E2C'},
+    {x:43,y:(tick*1.2+29)%40,c:'#FED42B'}
+  ];
+  leaves.forEach(lf=>{ px(lf.x,lf.y,3,2,lf.c); px(lf.x+1,lf.y-1,2,3,lf.c); });
+
+  const fast=heartBoost>0;
+  const hy=15+(Math.floor(tick/(fast?1:(audio.paused?3:2)))%2);
+  const hx=43;
+  g.globalAlpha=.25; px(hx-2,hy-1,11,10,'#FF6F98'); g.globalAlpha=1;
+  px(hx+1,hy,2,2,'#FF2E63'); px(hx+4,hy,2,2,'#FF2E63');
+  px(hx,hy+1,7,2,'#FF2E63'); px(hx+1,hy+3,5,2,'#FF2E63');
+  px(hx+2,hy+5,3,1,'#FF2E63'); px(hx+3,hy+6,1,1,'#FF2E63'); px(hx+1,hy+1,1,1,'#FF9EBB');
+
+  for(const m of minis){ g.globalAlpha=clamp(m.life,0,1); px(m.x,m.y,1,1,'#FF8FB4'); px(m.x+2,m.y,1,1,'#FF8FB4'); px(m.x,m.y+1,3,1,'#FF8FB4'); px(m.x+1,m.y+2,1,1,'#FF8FB4'); }
+  g.globalAlpha=1;
+  for(const L of extra){ px(L.x,L.y,3,2,L.c); px(L.x+1,L.y-1,2,3,L.c); }
+}
+function update(dt,t){
+  for(let i=extra.length-1;i>=0;i--){ const L=extra[i]; L.y+=L.vy*dt; L.x+=(Math.cos(t*1.6+L.ph)*10+L.vx)*dt; if(L.y>100||L.x>100) extra.splice(i,1); }
+  for(let i=minis.length-1;i>=0;i--){ const m=minis[i]; m.x+=m.vx*dt; m.y+=m.vy*dt; m.life-=dt*.7; if(m.life<=0) minis.splice(i,1); }
+  heartBoost=Math.max(0,heartBoost-dt);
+  miniClock+=dt; if(!audio.paused && miniClock>2.6){ miniClock=0; spawnMinis(1); }
+}
+function draw(t){
+  drawCouple(t/.18,t);
+  vctx.imageSmoothingEnabled=false;
+  vctx.drawImage(low,0,0,view.width,view.height);
+}
+view.addEventListener('click',e=>{
+  burstAt(['❤️','🐾','💛'],e.clientX,e.clientY,16); spawnMinis(3); heartBoost=1;
+  if(audio.paused) play();
+});
+function makeArtwork(){
+  try{ const c=document.createElement('canvas'); c.width=c.height=288; const x=c.getContext('2d'); x.imageSmoothingEnabled=false; x.drawImage(low,0,0,288,288); artURL=c.toDataURL('image/png'); msMeta(); }catch(e){}
+}
+
+/* =========================================================
+   РАЗМЕРЫ И ЗАПУСК
+   ========================================================= */
+function layout(){
+  const r=stage.getBoundingClientRect();
+  const s=Math.max(80,Math.floor(Math.min(r.width,r.height)));
+  cover.style.width=cover.style.height=s+'px';
+  document.documentElement.style.setProperty('--cs',s+'px');
+  const d=Math.min(window.devicePixelRatio||1,3);
+  view.width=view.height=Math.round(s*d);
+  if(mode==='lyr') scrollToLine(lineIdx,false);
+}
+window.addEventListener('resize',layout);
+window.addEventListener('orientationchange',()=>setTimeout(layout,250));
+if(window.visualViewport) window.visualViewport.addEventListener('resize',layout);
+if(window.ResizeObserver) new ResizeObserver(layout).observe(stage);
+
+let lastNow=performance.now(), first=true;
+function loop(now){
+  const dt=Math.min(.05,(now-lastNow)/1000); lastNow=now;
+  const t=now/1000;
+  update(dt,t); draw(t); ui();
+  if(first){ first=false; makeArtwork(); }
+  requestAnimationFrame(loop);
+}
+
+selectTrack(0,false);
+setLine(-1);
+layout();
+audioSession();
+requestAnimationFrame(loop);
+setTimeout(buildAudio,150);
+setTimeout(()=>toast('Для моей родной Кисы','💛'),700);
+})();
+</script>
+</body>
+</html>
